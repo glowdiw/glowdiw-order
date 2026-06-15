@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Form Pemesanan Glowdiww</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f4fb; min-height: 100vh; padding: 24px 16px 48px; color: #1a1a2e; }
+  .container { max-width: 520px; margin: 0 auto; }
+  .header { text-align: center; margin-bottom: 24px; }
+  .header h1 { font-size: 22px; font-weight: 600; color: #3C3489; }
+  .header p { font-size: 13px; color: #888; margin-top: 4px; }
+  .card { background: #fff; border-radius: 14px; padding: 20px; margin-bottom: 14px; border: 1px solid #ede9f8; }
+  .section-title { font-size: 11px; font-weight: 600; color: #7F77DD; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 14px; }
+  label { display: block; font-size: 13px; font-weight: 500; color: #555; margin-bottom: 5px; margin-top: 14px; }
+  label:first-of-type { margin-top: 0; }
+  input[type=text], input[type=date], input[type=number], textarea {
+    width: 100%; border: 1px solid #ddd; border-radius: 8px;
+    padding: 10px 12px; font-size: 14px; color: #1a1a2e;
+    background: #fafafa; outline: none; font-family: inherit;
+    transition: border-color 0.2s;
+  }
+  input:focus, textarea:focus { border-color: #7F77DD; background: #fff; }
+  textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+  .req { color: #c0392b; margin-left: 2px; }
+  .opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px; }
+  .opt-card {
+    border: 1.5px solid #e0ddf5; border-radius: 10px;
+    padding: 11px 12px; cursor: pointer; background: #fafafa;
+    transition: all 0.15s;
+  }
+  .opt-card:hover { border-color: #AFA9EC; background: #f5f4fb; }
+  .opt-card.selected { border-color: #7F77DD; background: #EEEDFE; }
+  .opt-card.selected .opt-name { color: #3C3489; }
+  .opt-card.selected .opt-price { color: #534AB7; }
+  .opt-name { font-size: 13px; font-weight: 600; color: #333; }
+  .opt-price { font-size: 12px; color: #888; margin-top: 2px; }
+  .opt-note { font-size: 11px; color: #7F77DD; margin-top: 3px; }
+  .opt-full { grid-column: 1 / -1; }
+  .dp-box {
+    background: #EEEDFE; border-radius: 10px; padding: 14px 16px;
+    margin-top: 14px; display: none;
+  }
+  .dp-label { font-size: 12px; color: #534AB7; font-weight: 500; }
+  .dp-amount { font-size: 22px; font-weight: 700; color: #3C3489; margin-top: 3px; }
+  .dp-note { font-size: 11px; color: #7F77DD; margin-top: 5px; line-height: 1.5; }
+  .sk-box { background: #f5f4fb; border-radius: 10px; padding: 14px 16px; margin-top: 4px; }
+  .sk-item { font-size: 12px; color: #666; line-height: 1.7; display: flex; gap: 8px; }
+  .sk-dot { color: #7F77DD; flex-shrink: 0; font-weight: 700; }
+  .checkbox-row { display: flex; gap: 10px; align-items: flex-start; margin-top: 14px; }
+  .checkbox-row input[type=checkbox] { width: 17px; height: 17px; margin-top: 2px; flex-shrink: 0; accent-color: #534AB7; }
+  .checkbox-label { font-size: 13px; color: #555; line-height: 1.5; }
+  .err-msg { font-size: 12px; color: #c0392b; margin-top: 10px; display: none; padding: 10px 14px; background: #fdf0ef; border-radius: 8px; }
+  .loading { text-align: center; padding: 14px; font-size: 13px; color: #7F77DD; display: none; }
+  .spinner {
+    display: inline-block; width: 16px; height: 16px;
+    border: 2px solid #ddd; border-top-color: #534AB7;
+    border-radius: 50%; animation: spin 0.7s linear infinite;
+    vertical-align: middle; margin-right: 8px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .submit-btn {
+    width: 100%; margin-top: 18px; padding: 14px;
+    border-radius: 10px; border: none;
+    background: #534AB7; color: #fff;
+    font-size: 16px; font-weight: 600; cursor: pointer;
+    font-family: inherit; transition: background 0.2s;
+  }
+  .submit-btn:hover { background: #3C3489; }
+  .submit-btn:active { transform: scale(0.98); }
+
+  /* Success */
+  #success-area { display: none; }
+  .success-banner {
+    background: #e8f8f1; border-radius: 14px; padding: 24px;
+    text-align: center; margin-bottom: 14px;
+  }
+  .success-icon { font-size: 48px; margin-bottom: 10px; }
+  .success-title { font-size: 18px; font-weight: 600; color: #0F6E56; }
+  .success-sub { font-size: 13px; color: #1D9E75; margin-top: 6px; }
+  .result-card { background: #fff; border-radius: 14px; padding: 16px 18px; border: 1px solid #ede9f8; margin-bottom: 14px; }
+  .result-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 7px 0; border-bottom: 1px solid #f0eef8; font-size: 13px; gap: 12px; }
+  .result-row:last-child { border-bottom: none; }
+  .result-key { color: #888; white-space: nowrap; }
+  .result-val { color: #1a1a2e; font-weight: 500; text-align: right; }
+  .btn-wa {
+    width: 100%; padding: 13px; border-radius: 10px; border: none;
+    background: #25D366; color: #fff; font-size: 15px; font-weight: 600;
+    cursor: pointer; font-family: inherit; margin-bottom: 10px;
+    transition: background 0.2s;
+  }
+  .btn-wa:hover { background: #1ebe5d; }
+  .btn-reset {
+    width: 100%; padding: 11px; border-radius: 10px;
+    border: 1.5px solid #ddd; background: transparent;
+    color: #888; font-size: 14px; cursor: pointer; font-family: inherit;
+  }
+  .btn-reset:hover { background: #f5f4fb; }
+
+  @media (max-width: 400px) {
+    .opt-grid { grid-template-columns: 1fr; }
+    .opt-full { grid-column: 1; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>✨ Glowdiww</h1>
+    <p>Form Pemesanan Design Layout</p>
+  </div>
+
+  <div id="form-area">
+
+    <!-- Data Pemesan -->
+    <div class="card">
+      <p class="section-title">Data Pemesan</p>
+      <label for="nama">Nama lengkap <span class="req">*</span></label>
+      <input type="text" id="nama" placeholder="Nama kamu">
+
+      <label for="kontak">No. WhatsApp / kontak <span class="req">*</span></label>
+      <input type="text" id="kontak" placeholder="08xxxxxxxxxx">
+
+      <label for="tgl">Tanggal dibutuhkan <span class="req">*</span></label>
+      <input type="date" id="tgl">
+    </div>
+
+    <!-- Pilih Paket -->
+    <div class="card">
+      <p class="section-title">Pilih Paket <span class="req">*</span></p>
+
+      <p style="font-size:12px; color:#888; font-weight:600; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.05em;">Desain saja</p>
+      <div class="opt-grid">
+        <div class="opt-card" onclick="selectPaket(this,'Starter – 20 halaman',50000)">
+          <p class="opt-name">20 halaman</p>
+          <p class="opt-price">Rp50.000</p>
+        </div>
+        <div class="opt-card" onclick="selectPaket(this,'Medium – 35 halaman',75000)">
+          <p class="opt-name">35 halaman</p>
+          <p class="opt-price">Rp75.000</p>
+        </div>
+        <div class="opt-card opt-full" onclick="selectPaket(this,'Large – 50 halaman',85000)">
+          <p class="opt-name">50 halaman</p>
+          <p class="opt-price">Rp85.000</p>
+          <p class="opt-note">✨ Full colour + games seru di dalamnya</p>
+        </div>
+      </div>
+
+      <p style="font-size:12px; color:#888; font-weight:600; margin-top:16px; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.05em;">Desain + Cetak</p>
+      <div class="opt-grid">
+        <div class="opt-card" onclick="selectPaket(this,'Desain+Cetak: 40 halaman Hardcover',146000)">
+          <p class="opt-name">40 hal · Hardcover</p>
+          <p class="opt-price">Rp146.000</p>
+        </div>
+        <div class="opt-card" onclick="selectPaket(this,'Desain+Cetak: 40 halaman Softcover',135000)">
+          <p class="opt-name">40 hal · Softcover</p>
+          <p class="opt-price">Rp135.000</p>
+        </div>
+        <div class="opt-card" onclick="selectPaket(this,'Desain+Cetak: Spiral 20 hal Hardcover',101000)">
+          <p class="opt-name">Spiral 20 hal · Hard</p>
+          <p class="opt-price">Rp101.000</p>
+        </div>
+        <div class="opt-card" onclick="selectPaket(this,'Desain+Cetak: Spiral 20 hal Softcover',88000)">
+          <p class="opt-name">Spiral 20 hal · Soft</p>
+          <p class="opt-price">Rp88.000</p>
+        </div>
+      </div>
+
+      <div class="dp-box" id="dp-box">
+        <p class="dp-label">DP 25% yang perlu dibayar</p>
+        <p class="dp-amount" id="dp-amount">Rp0</p>
+        <p class="dp-note">Dibayar setelah desain disetujui<br>via QRIS atau BSI rek xxxx · a.n. Nayla Dhiau Rasyidah</p>
+      </div>
+    </div>
+
+    <!-- Detail Pesanan -->
+    <div class="card">
+      <p class="section-title">Detail Pesanan</p>
+
+      <label for="tema">Request tema / konsep</label>
+      <input type="text" id="tema" placeholder="Contoh: aesthetic, vintage, minimalis...">
+
+      <label for="jml-foto">Jumlah foto yang akan dikirim <span class="req">*</span></label>
+      <input type="number" id="jml-foto" placeholder="Minimal 20 foto" min="20">
+
+      <label for="tulisan">Bahan tulisan / cerita <span class="req">*</span></label>
+      <textarea id="tulisan" placeholder="Tulis di sini, atau isi Google Docs yang sudah disediakan lalu paste di sini"></textarea>
+
+      <label for="catatan">Catatan tambahan</label>
+      <textarea id="catatan" placeholder="Ada permintaan khusus? Tulis di sini ya..." style="min-height:60px;"></textarea>
+    </div>
+
+    <!-- Syarat & Ketentuan -->
+    <div class="card">
+      <p class="section-title">Syarat & Ketentuan</p>
+      <div class="sk-box">
+        <div class="sk-item"><span class="sk-dot">·</span><span>Kirim minimal <strong>20 foto</strong> untuk diproses</span></div>
+        <div class="sk-item"><span class="sk-dot">·</span><span>DP <strong>25%</strong> dibayar setelah desain fix sebelum pengerjaan dimulai</span></div>
+        <div class="sk-item"><span class="sk-dot">·</span><span>Estimasi pengerjaan <strong>3–7 hari</strong> kerja</span></div>
+        <div class="sk-item"><span class="sk-dot">·</span><span>Tidak punya konsep? Tersedia Google Docs panduan, tinggal isi tulisan sesuai arahan</span></div>
+        <div class="sk-item"><span class="sk-dot">·</span><span>Boleh request tema sesuai selera kak</span></div>
+        <div class="sk-item"><span class="sk-dot">·</span><span>Pembayaran via <strong>QRIS</strong> atau <strong>BSI</strong> rek xxxx · a.n. Nayla Dhiau Rasyidah</span></div>
+        <div class="sk-item"><span class="sk-dot">·</span><span>Desain <strong>full colour</strong> sudah termasuk games seru di dalamnya</span></div>
+      </div>
+      <div class="checkbox-row">
+        <input type="checkbox" id="setuju">
+        <label class="checkbox-label" for="setuju">Saya sudah membaca dan menyetujui syarat & ketentuan Glowdiww</label>
+      </div>
+    </div>
+
+    <p class="err-msg" id="err-msg"></p>
+    <div class="loading" id="loading"><span class="spinner"></span>Mengirim pesanan...</div>
+    <button class="submit-btn" id="submit-btn" onclick="submitForm()">Kirim Pesanan 💌</button>
+
+  </div>
+
+  <!-- Success Area -->
+  <div id="success-area">
+    <div class="success-banner">
+      <div class="success-icon">🎉</div>
+      <p class="success-title">Pesanan Berhasil Dikirim!</p>
+      <p class="success-sub" id="success-sub">Data sudah masuk ke sistem Glowdiww</p>
+    </div>
+    <div class="result-card" id="result-card"></div>
+    <button class="btn-wa" onclick="openWA()">💬 Konfirmasi via WhatsApp</button>
+    <button class="btn-reset" onclick="resetForm()">Buat Pesanan Baru</button>
+  </div>
+</div>
+
+<script>
+  const SHEET_URL = 'https://script.google.com/macros/s/AKfycbwvdhZjGLR20S2E7XL8zqCy7G4HYGeHRuqhCPJaePrkvVdRBv4AAvck9yapqvgH0c0Y/exec';
+  const WA_NUMBER = '6283866942135';
+
+  let selectedPaket = null;
+  let selectedHarga = 0;
+  let waMsg = '';
+
+  function selectPaket(el, nama, harga) {
+    document.querySelectorAll('.opt-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedPaket = nama;
+    selectedHarga = harga;
+    const dp = Math.round(harga * 0.25);
+    document.getElementById('dp-box').style.display = 'block';
+    document.getElementById('dp-amount').textContent = 'Rp' + dp.toLocaleString('id-ID');
+  }
+
+  function showErr(msg) {
+    const e = document.getElementById('err-msg');
+    e.textContent = msg;
+    e.style.display = 'block';
+  }
+
+  async function submitForm() {
+    const nama = document.getElementById('nama').value.trim();
+    const kontak = document.getElementById('kontak').value.trim();
+    const tgl = document.getElementById('tgl').value;
+    const foto = document.getElementById('jml-foto').value;
+    const tulisan = document.getElementById('tulisan').value.trim();
+    const setuju = document.getElementById('setuju').checked;
+    const tema = document.getElementById('tema').value.trim() || '-';
+    const catatan = document.getElementById('catatan').value.trim() || '-';
+    const err = document.getElementById('err-msg');
+    err.style.display = 'none';
+
+    if (!nama) { showErr('Nama lengkap wajib diisi ya kak!'); return; }
+    if (!kontak) { showErr('No. WhatsApp / kontak wajib diisi!'); return; }
+    if (!tgl) { showErr('Tanggal dibutuhkan wajib diisi!'); return; }
+    if (!selectedPaket) { showErr('Pilih paket dulu ya kak!'); return; }
+    if (!foto || parseInt(foto) < 20) { showErr('Jumlah foto minimal 20 ya kak!'); return; }
+    if (!tulisan) { showErr('Bahan tulisan wajib diisi!'); return; }
+    if (!setuju) { showErr('Centang persetujuan syarat & ketentuan dulu ya kak!'); return; }
+
+    const dp = Math.round(selectedHarga * 0.25);
+
+    document.getElementById('submit-btn').style.display = 'none';
+    document.getElementById('loading').style.display = 'block';
+
+    const payload = {
+      timestamp: new Date().toLocaleString('id-ID'),
+      nama, kontak, paket: selectedPaket,
+      harga: selectedHarga, dp, tgl, tema,
+      foto, tulisan, catatan
+    };
+
+    let sheetOK = false;
+    try {
+      await fetch(SHEET_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      sheetOK = true;
+    } catch(e) { sheetOK = false; }
+
+    document.getElementById('loading').style.display = 'none';
+
+    waMsg = `*PESANAN BARU - GLOWDIWW* 💌\n\n` +
+      `👤 Nama: ${nama}\n📱 Kontak: ${kontak}\n` +
+      `📦 Paket: ${selectedPaket}\n` +
+      `💰 Total: Rp${selectedHarga.toLocaleString('id-ID')}\n` +
+      `💳 DP 25%: Rp${dp.toLocaleString('id-ID')}\n` +
+      `📅 Tgl dibutuhkan: ${tgl}\n` +
+      `🎨 Tema: ${tema}\n` +
+      `📸 Jumlah foto: ${foto}\n` +
+      `✏️ Tulisan: ${tulisan}\n` +
+      `📝 Catatan: ${catatan}`;
+
+    const rows = [
+      ['Nama', nama], ['Kontak', kontak], ['Paket', selectedPaket],
+      ['Total harga', 'Rp' + selectedHarga.toLocaleString('id-ID')],
+      ['DP 25%', 'Rp' + dp.toLocaleString('id-ID')],
+      ['Tgl dibutuhkan', tgl], ['Tema', tema],
+      ['Jumlah foto', foto + ' foto'], ['Catatan', catatan],
+    ];
+
+    let html = '';
+    rows.forEach(([k, v]) => {
+      html += `<div class="result-row"><span class="result-key">${k}</span><span class="result-val">${v}</span></div>`;
+    });
+    document.getElementById('result-card').innerHTML = html;
+    document.getElementById('success-sub').textContent = sheetOK
+      ? 'Data sudah masuk ke Google Sheets Glowdiww ✓'
+      : 'Konfirmasi pesanan via WhatsApp di bawah ya kak';
+
+    document.getElementById('form-area').style.display = 'none';
+    document.getElementById('success-area').style.display = 'block';
+    window.scrollTo(0, 0);
+  }
+
+  function openWA() {
+    window.open('https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(waMsg), '_blank');
+  }
+
+  function resetForm() {
+    ['nama','kontak','tgl','tema','jml-foto','tulisan','catatan'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('setuju').checked = false;
+    document.getElementById('dp-box').style.display = 'none';
+    document.getElementById('err-msg').style.display = 'none';
+    document.getElementById('submit-btn').style.display = 'block';
+    document.querySelectorAll('.opt-card').forEach(c => c.classList.remove('selected'));
+    selectedPaket = null; selectedHarga = 0; waMsg = '';
+    document.getElementById('form-area').style.display = 'block';
+    document.getElementById('success-area').style.display = 'none';
+    window.scrollTo(0, 0);
+  }
+</script>
+</body>
+</html>
